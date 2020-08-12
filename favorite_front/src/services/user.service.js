@@ -17,6 +17,16 @@ class UserService {
       return response.data;
     })
   }
+
+  deleteAccount(name) {    
+    const data = {
+      name: name
+    }
+    return axios.post(API_URL + 'deleteAccount', data, {headers: authHeader()})
+    .then(response =>{
+      return response.data;
+    })
+  }
 }
 
 export default new UserService();

@@ -5,11 +5,12 @@ import { makeStyles } from '@material-ui/core/styles';
 import FormControl from '@material-ui/core/FormControl';
 import InputLabel from '@material-ui/core/InputLabel';
 import Select from '@material-ui/core/Select';
-// import {TopbarOmit} from 'components'
-import { TopbarOmit } from 'components';
 import UserService from 'services/user.service';
 import Snackbar from '@material-ui/core/Snackbar';
 import MuiAlert from '@material-ui/lab/Alert';
+
+import {TopbarOmit, ContainedBlueButton} from 'components';
+import userService from 'services/user.service';
 
 const useStyles = makeStyles(theme => ({
   name: {
@@ -55,7 +56,10 @@ const useStyles = makeStyles(theme => ({
   select: {
     marginTop: theme.spacing(2),
     width: '100%'
-  }
+  },
+  buttonProp: { 
+    margin: '30px 0px'
+  },
 }));
 
 function Alert(props) {
@@ -64,6 +68,7 @@ function Alert(props) {
 
 const Favorite = props => {
   const classes = useStyles();
+  const { history } = props;
   const [defaultSelect, setDefaultSelect] = useState("");
   const [favorites, setFavorites] = useState([]);
   const [isDataLoaded, setIsDataLoaded] = useState(false);
@@ -116,6 +121,38 @@ const Favorite = props => {
     setOpen(false);
   };
 
+  const handleDeleteAccount = (event) => {
+    userService.deleteAccount("delete")
+    .then(
+      response => {
+        if(response.success === true ) {
+          history.push('/sign-up');
+          window.location.reload();
+        } else {
+          setAlert(response.message);
+          setOpen(true);
+        }
+      },
+      error => {
+        const resMessage =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();        
+        setAlert(resMessage);
+        setOpen(true);
+      }
+    )
+
+  }
+
+  const handleLogout = (event) => {
+    localStorage.removeItem("user");
+    history.push('/log-in');
+    window.location.reload();
+  }
+
   if(isDataLoaded) {
     return (
       <div className={classes.content}>
@@ -148,8 +185,14 @@ const Favorite = props => {
                   ))}
                 </Select>
               </FormControl>
-            </div>                             
-          </form>
+            </div>  
+            <div className={classes.buttonProp}>
+              <ContainedBlueButton  onClick={handleDeleteAccount} width={"100%"} height={50} title={"Delete account"}/>
+            </div>           
+            <div className={classes.buttonProp}>
+              <ContainedBlueButton  onClick={handleLogout} width={"100%"} height={50} title={"Log out"}/>
+            </div>                          
+          </form>  
         </div>
       </div>
     );
